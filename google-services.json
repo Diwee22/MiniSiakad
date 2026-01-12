@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "53954666867",
+    "project_id": "khsapp-d60b9",
+    "storage_bucket": "khsapp-d60b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53954666867:android:eee0b529e60e2dc3272506",
+        "android_client_info": {
+          "package_name": "com.aldi.khsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPKx310MRcrSgkZnSUDa6aGfTFUC4nNSE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

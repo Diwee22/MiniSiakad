@@ -1,0 +1,12 @@
+[
+  { "no": 1, "nama": "Kontrol dan Audit Sistem Informasi", "kode": "MK205007", "uts": 90, "uas": 93, "akhir": 91.5, "huruf": "A", "mutu": 4.0 },
+  { "no": 2, "nama": "Statistik Komputasi", "kode": "DK200019", "uts": 88, "uas": 85, "akhir": 86.5, "huruf": "A", "mutu": 4.0 },
+  { "no": 3, "nama": "Pemrograman Mobile 2", "kode": "MK205014", "uts": 84, "uas": 86, "akhir": 85, "huruf": "A-", "mutu": 3.7 },
+  { "no": 4, "nama": "Rekayasa Sistem Informasi", "kode": "DK200015", "uts": 90, "uas": 88, "akhir": 89, "huruf": "A", "mutu": 4.0 },
+  { "no": 5, "nama": "Testing & Implementasi SI", "kode": "MK205026", "uts": 86, "uas": 88, "akhir": 87, "huruf": "A", "mutu": 4.0 },
+  { "no": 6, "nama": "Manajemen Resiko TI", "kode": "MP205001", "uts": 87, "uas": 89, "akhir": 88, "huruf": "A", "mutu": 4.0 },
+  { "no": 7, "nama": "Leadership & Communication Skill", "kode": "MK205009", "uts": 85, "uas": 90, "akhir": 87.5, "huruf": "A", "mutu": 4.0 },
+  { "no": 8, "nama": "Bahasa Inggris III (Conversation)", "kode": "DK205004", "uts": 84, "uas": 86, "akhir": 85, "huruf": "A-", "mutu": 3.7 },
+  { "no": 9, "nama": "KPAM V (Korespondensi)", "kode": "MP205010", "uts": 88, "uas": 90, "akhir": 89, "huruf": "A", "mutu": 4.0 },
+  { "no": 10, "nama": "Praktek Adaptasi Lapangan", "kode": "MK205030", "uts": 87, "uas": 92, "akhir": 89.5, "huruf": "A", "mutu": 4.0 }
+]

@@ -79,6 +79,7 @@ export default function DashboardDosen() {
           <Ionicons name="create-outline" size={22} color="#ecf0f1" />
           <Text style={styles.menuText}>Input Nilai</Text>
         </TouchableOpacity>
+        
 
         <TouchableOpacity
           style={styles.menuItem}

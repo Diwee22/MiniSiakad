@@ -6,12 +6,10 @@ import {
   Pressable,
   StyleSheet,
   Linking,
-  Platform,
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as DocumentPicker from "expo-document-picker";
-import * as FileSystem from "expo-file-system";
 
 type Tugas = {
   id: string;
@@ -19,9 +17,8 @@ type Tugas = {
   deskripsi: string;
   deadline: string;
 
-  soalBase64?: string;
-  soalName?: string;
-  soalType?: string;
+  fileUri?: string;   // ✅ SOAL DARI DOSEN
+  fileName?: string;
 
   nilai?: number;
   komentar?: string;
@@ -52,49 +49,14 @@ export default function TugasMahasiswa() {
     if (jawabanData) setJawaban(JSON.parse(jawabanData));
   };
 
-  // ================= BUKA SOAL =================
+  // ================= BUKA SOAL (FILE URI) =================
   const openSoal = async (item: Tugas) => {
-    if (!item.soalBase64 || !item.soalName) {
-      alert("Soal tidak tersedia");
+    if (!item.fileUri) {
+      Alert.alert("Soal tidak tersedia");
       return;
     }
 
-    const mime = item.soalType || "application/pdf";
-
-    // ===== WEB =====
-    if (Platform.OS === "web") {
-      const byteCharacters = atob(item.soalBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: mime });
-      const url = URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = item.soalName;
-      link.target = "_blank";
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      URL.revokeObjectURL(url);
-      return;
-    }
-
-    // ===== MOBILE =====
-    const uri = FileSystem.cacheDirectory + item.soalName;
-
-    await FileSystem.writeAsStringAsync(uri, item.soalBase64, {
-      encoding: "base64",
-    });
-
-    await Linking.openURL(uri);
+    await Linking.openURL(item.fileUri);
   };
 
   // ================= UPLOAD / EDIT JAWABAN =================
@@ -133,9 +95,7 @@ export default function TugasMahasiswa() {
           text: "Hapus",
           style: "destructive",
           onPress: async () => {
-            const updated = jawaban.filter(
-              (j) => j.tugasId !== tugasId
-            );
+            const updated = jawaban.filter((j) => j.tugasId !== tugasId);
             setJawaban(updated);
             await AsyncStorage.setItem(
               JAWABAN_KEY,
@@ -192,15 +152,15 @@ export default function TugasMahasiswa() {
                 </View>
 
                 {/* 📎 LIHAT SOAL */}
-                {item.soalBase64 && (
+                {item.fileUri && (
                   <Pressable onPress={() => openSoal(item)}>
                     <Text style={styles.link}>
-                      📎 Lihat Soal ({item.soalName})
+                      📎 Lihat Soal ({item.fileName})
                     </Text>
                   </Pressable>
                 )}
 
-                {/* 📤 EDIT & HAPUS JAWABAN */}
+                {/* 📤 UPLOAD / EDIT */}
                 <View style={styles.actionRow}>
                   <Pressable
                     style={styles.upload}
@@ -228,13 +188,15 @@ export default function TugasMahasiswa() {
                   </Text>
                 )}
 
-                {/* 🧮 NILAI */}
+                {/* 🧮 NILAI & KOMENTAR */}
                 {item.nilai !== undefined && (
                   <View style={styles.nilaiBox}>
                     <Text style={styles.nilaiText}>
                       Nilai: {item.nilai}
                     </Text>
-                    <Text>{item.komentar}</Text>
+                    {item.komentar && (
+                      <Text>💬 Komentar: {item.komentar}</Text>
+                    )}
                   </View>
                 )}
               </View>
@@ -248,7 +210,7 @@ export default function TugasMahasiswa() {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#F1F5F9" },
-  container: { flex: 1, width: "100%", padding: 20 },
+  container: { flex: 1, padding: 20 },
 
   title: {
     fontSize: 24,
@@ -262,9 +224,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 14,
     marginBottom: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
     elevation: 4,
   },
 

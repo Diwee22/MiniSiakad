@@ -20,18 +20,26 @@ import { sendNotification } from "../lib/notification";
 export default function DashboardMahasiswa() {
   const router = useRouter();
 
+  // DATA UTAMA
+  const [uid, setUid] = useState("");
   const [nama, setNama] = useState("");
   const [nim, setNim] = useState("");
   const [photoURL, setPhotoURL] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [uid, setUid] = useState("");
 
-  // 🔔 NOTIF STATE
+  // DATA DIRI (SYNC DARI PROFIL)
+  const [alamat, setAlamat] = useState("");
+  const [namaIbu, setNamaIbu] = useState("");
+  const [tempatLahir, setTempatLahir] = useState("");
+  const [tanggalLahir, setTanggalLahir] = useState("");
+
+  const [loading, setLoading] = useState(true);
+
+  // 🔔 NOTIF
   const [notifCount, setNotifCount] = useState(0);
   const [notifDetail, setNotifDetail] = useState("");
   const [showNotif, setShowNotif] = useState(false);
 
-  /* ================= AUTH ================= */
+  /* ================= AUTH & LOAD USER ================= */
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -43,23 +51,28 @@ export default function DashboardMahasiswa() {
       const snap = await getDoc(doc(db, "users", user.uid));
 
       if (snap.exists()) {
-        const data = snap.data();
-        setNama(data.nama);
-        setNim(data.nim);
-        setPhotoURL(data.photoURL || null);
+        const d = snap.data();
+        setNama(d.nama || "");
+        setNim(d.nim || "");
+        setPhotoURL(d.photoURL || null);
+        setAlamat(d.alamat || "-");
+        setNamaIbu(d.namaIbu || "-");
+        setTempatLahir(d.tempatLahir || "-");
+        setTanggalLahir(d.tanggalLahir || "-");
       }
+
       setLoading(false);
     });
 
     return unsub;
   }, []);
 
-  /* ================= PERMISSION NOTIFICATION ================= */
+  /* ================= PERMISSION NOTIF ================= */
   useEffect(() => {
     Notifications.requestPermissionsAsync();
   }, []);
 
-  /* ================= SIMPAN DATA NOTIF (DUMMY) ================= */
+  /* ================= DUMMY NOTIF ================= */
   useEffect(() => {
     AsyncStorage.setItem(
       "notif_data",
@@ -78,11 +91,8 @@ export default function DashboardMahasiswa() {
       if (!data) return;
 
       const notif = JSON.parse(data);
-
       const total =
-        notif.tugasBelum +
-        notif.pesan +
-        (notif.akademik ? 1 : 0);
+        notif.tugasBelum + notif.pesan + (notif.akademik ? 1 : 0);
 
       setNotifCount(total);
 
@@ -90,7 +100,6 @@ export default function DashboardMahasiswa() {
         `📚 ${notif.tugasBelum} tugas belum dikerjakan\n📩 ${notif.pesan} pesan baru\nℹ️ ${notif.akademik}`
       );
 
-      // SYSTEM NOTIFICATION (MOBILE ONLY)
       if (notif.tugasBelum > 0) {
         sendNotification(
           "Tugas Belum Dikerjakan",
@@ -106,7 +115,6 @@ export default function DashboardMahasiswa() {
   const pickImage = async () => {
     const { status } =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
-
     if (status !== "granted") return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -132,13 +140,21 @@ export default function DashboardMahasiswa() {
 
   return (
     <View style={styles.page}>
-      {/* SIDEBAR */}
+      {/* ================= SIDEBAR ================= */}
       <View style={styles.sidebar}>
         <Text style={styles.sidebarTitle}>Mahasiswa</Text>
 
         <TouchableOpacity style={styles.menuActive}>
           <Ionicons name="home-outline" size={20} color="#fff" />
           <Text style={styles.menuTextActive}>Dashboard</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menu}
+          onPress={() => router.push("/profil")}
+        >
+          <Ionicons name="person-outline" size={20} color="#fff" />
+          <Text style={styles.menuText}>Profil</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -169,7 +185,7 @@ export default function DashboardMahasiswa() {
         </TouchableOpacity>
       </View>
 
-      {/* CONTENT */}
+      {/* ================= CONTENT ================= */}
       <View style={styles.content}>
         {/* TOP BAR */}
         <View style={styles.topBar}>
@@ -197,7 +213,6 @@ export default function DashboardMahasiswa() {
             <View style={styles.notifBox}>
               <Text style={styles.notifTitle}>🔔 Notifikasi</Text>
               <Text style={styles.notifContent}>{notifDetail}</Text>
-
               <TouchableOpacity
                 style={styles.notifClose}
                 onPress={() => setShowNotif(false)}
@@ -208,7 +223,7 @@ export default function DashboardMahasiswa() {
           </View>
         )}
 
-        {/* PROFIL */}
+        {/* PROFIL CARD */}
         <View style={styles.card}>
           <TouchableOpacity onPress={pickImage}>
             <Image
@@ -225,12 +240,19 @@ export default function DashboardMahasiswa() {
           <View>
             <Text style={styles.nama}>{nama}</Text>
             <Text style={styles.nim}>NIM: {nim}</Text>
-            <Text style={styles.prodi}>
-              Sistem Informasi • Semester 5
-            </Text>
+            <Text style={styles.prodi}>Sistem Informasi • Semester 5</Text>
           </View>
         </View>
 
+        {/* DATA DIRI */}
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Data Diri Mahasiswa</Text>
+          <Text>Alamat: {alamat}</Text>
+          <Text>Nama Ibu: {namaIbu}</Text>
+          <Text>TTL: {tempatLahir}, {tanggalLahir}</Text>
+        </View>
+
+        {/* AKADEMIK */}
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Informasi Akademik</Text>
           <Text>IP Semester: 3.65</Text>
